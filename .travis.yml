@@ -1,0 +1,32 @@
+sudo: false
+language: python
+python:
+  - '2.7'
+  - '3.6'
+  - '3.7-dev'
+before_script:
+  - pip install -e .
+  - pip install pycodestyle
+  - pip install coverage
+  - pip install coveralls
+  - npm install -g jshint
+  - cp travis-ci/manage.py manage.py
+script:
+  - pycodestyle r25_calendar/
+  - python -m compileall r25_calendar/
+  - coverage run --source=r25_calendar manage.py test r25_calendar
+after_script:
+  - coveralls
+before_deploy:
+  - find r25_calendar/ -name \*.pyc -exec rm {} \;
+  - echo $TRAVIS_TAG > r25_calendar/VERSION
+deploy:
+  provider: pypi
+  user: bradleyb
+  skip_cleanup: true
+  password:
+    secure: ""
+  on:
+    tags: true
+    python: '3.6'
+

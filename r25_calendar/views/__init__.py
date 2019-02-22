@@ -69,7 +69,8 @@ def space_reservations(request, space_name=None, res_date=None):
                 )],
             }
 
-            return render(request, 'r25_calendar/space-reservations.html', context)
+            return render(request, 'r25_calendar/space-reservations.html',
+                          context)
 
     else:
         for sp in sorted(space_list, key=Space.name_fixed):
