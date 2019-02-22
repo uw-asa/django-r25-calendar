@@ -1,0 +1,86 @@
+{% extends 'supporttools/base.html' %}
+
+{% block content %}
+
+<div role="main" class="container-fluid">
+
+<h2>R25 Room Schedules{% if space %}: {{ space.name }}{% elif space_name %}: {{ space_name }}{% endif %}</h2>
+
+<ul class="list-group">
+{% for message in messages %}
+    <li class="list-group-item">{{ message }}</li>
+{% endfor %}
+</ul>
+
+{% if space %}
+
+<nav>
+    <ul class="pager">
+        <li class="previous"><a href="{% url 'r25_space_reservations' space.name_fixed date_prev|date:"Y-m-d" %}"><span aria-hidden="true">&larr;</span><span class="hidden-xs"> Previous</span></a></li>
+        <li class="datebox"><span class="dateinput"><input type="date" name="resdate" value="{{ date_this|date:"Y-m-d" }}"/></span><span class="datelabel">{{ date_this|date:"D, Y-m-d" }}</span></li>
+        <li class="next"><a href="{% url 'r25_space_reservations' space.name_fixed date_next|date:"Y-m-d" %}"><span aria-hidden="true">&rarr;</span><span class="hidden-xs"> Next</span></a></li>
+    </ul>
+</nav>
+
+<ul class="list-group">
+{% for reservation in reservations %}
+    <li class="list-group-item"><a href="https://25live.collegenet.com/washington/#details&obj_type=event&obj_id={{ reservation.event_id }}">
+        {{ reservation.start_datetime_parsed|date:"H:i" }}-{{ reservation.end_datetime_parsed|date:"H:i" }}:
+        {{ reservation.event_name }}</a></li>
+{% endfor %}
+</ul>
+
+<nav>
+    <ul class="pager">
+        <li class="previous"><a href="{% url 'r25_space_reservations' space.name_fixed date_prev|date:"Y-m-d" %}"><span aria-hidden="true">&larr;</span><span class="hidden-xs"> Previous</span></a></li>
+        <li class="datebox"><span class="dateinput"><input type="date" name="resdate" value="{{ date_this|date:"Y-m-d" }}"/></span><span class="datelabel">{{ date_this|date:"D, Y-m-d" }}</span></li>
+        <li class="next"><a href="{% url 'r25_space_reservations' space.name_fixed date_next|date:"Y-m-d" %}"><span aria-hidden="true">&rarr;</span><span class="hidden-xs"> Next</span></a></li>
+    </ul>
+</nav>
+
+{% elif space_name %}
+
+<ul class="list-group">
+{% for room in rooms %}
+    <li class="list-group-item"><a href="{% url 'r25_space' room.space.name_fixed %}">{{ space_name }} {{ room.name }}</a></li>
+{% endfor %}
+</ul>
+
+{% else %}
+
+<ul class="list-group">
+{% for building in buildings %}
+    <li class="list-group-item"><a href="{% url 'r25_space' building %}">{{ building }}</a></li>
+{% endfor %}
+</ul>
+
+{% endif %}
+
+</div>
+
+{% endblock content %}
+
+{% block extra_css %}
+<style>
+    .datebox .dateinput input {
+        line-height: inherit;
+        border: none;
+    }
+</style>
+{% endblock extra_css %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+    $('.datebox .dateinput').hide();
+    $('.datebox .datelabel').click(function() {
+        $(this).closest('.datelabel').hide();
+        $(this).closest('.datebox').children('.dateinput').show();
+    });
+    $('.datebox .dateinput input').change(function() {
+{% if space %}
+        window.location.href = "{% url 'r25_space' space.name_fixed %}/" + this.value;
+{% endif %}
+    });
+</script>
+{% endblock extra_js %}
